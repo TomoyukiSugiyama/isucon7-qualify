@@ -723,7 +723,7 @@ func tRange(a, b int64) []int64 {
 
 func main() {
 	go func() {
-		log.Println(http.ListenAndServe("127.0.0.1:6060", nil))
+		log.Println(http.ListenAndServe("127.0.0.1", nil))
 	}()
 
 	e := echo.New()
