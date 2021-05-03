@@ -731,7 +731,7 @@ func main() {
 	m.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
 
 	s := &http.Server{
-		Addr:    "0.0.0.0:6060",
+		Addr:    ":6060",
 		Handler: m,
 	}
 	go func() {
