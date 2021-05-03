@@ -12,7 +12,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"net/http/pprof"
+	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"strings"
@@ -722,20 +722,8 @@ func tRange(a, b int64) []int64 {
 }
 
 func main() {
-	// pprof
-	m := http.NewServeMux()
-	m.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
-	m.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
-	m.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
-	m.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
-	m.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
-
-	s := &http.Server{
-		Addr:    ":6060",
-		Handler: m,
-	}
 	go func() {
-		s.ListenAndServe()
+		log.Println(http.ListenAndServe(":6060", nil))
 	}()
 
 	e := echo.New()
