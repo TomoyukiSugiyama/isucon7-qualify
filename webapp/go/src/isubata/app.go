@@ -18,7 +18,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/go-sql-driver/mysql"
+	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
@@ -721,10 +723,51 @@ func tRange(a, b int64) []int64 {
 	return r
 }
 
+// Connection
+func Connection() redis.Conn {
+	const Addr = "127.0.0.1:6379"
+
+	c, err := redis.Dial("tcp", Addr)
+	if err != nil {
+		panic(err)
+	}
+	return c
+}
+
+// データの登録(Redis: SET key value)
+func Set(key, value string, c redis.Conn) string {
+	res, err := redis.String(c.Do("SET", key, value))
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
+// データの取得(Redis: GET key)
+func Get(key string, c redis.Conn) string {
+	res, err := redis.String(c.Do("GET", key))
+	if err != nil {
+		panic(err)
+	}
+	return res
+}
+
 func main() {
 	go func() {
 		log.Println(http.ListenAndServe(":6060", nil))
 	}()
+
+	// 接続
+	c := Connection()
+	defer c.Close()
+
+	// データの登録(Redis: SET key value)
+	res_set := Set("sample-key", "sample-value", c)
+	fmt.Println(res_set) // OK
+
+	// データの取得(Redis: GET key)
+	res_get := Get("sample-key", c)
+	fmt.Println(res_get) // sample-value
 
 	e := echo.New()
 	funcs := template.FuncMap{
